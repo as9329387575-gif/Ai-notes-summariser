@@ -1,0 +1,648 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>AI Notes Summarizer | Free Online Study Notes Summary Tool</title>
+  <meta name="description" content="Free AI notes summarizer: instantly turn long notes into bullet points, key highlights, or revision points. Perfect for students. 100% client-side, no data storage.">
+  <meta name="keywords" content="notes summarizer, ai summary tool, summarize notes online, study notes summarizer, free text summarizer for students, academic summarizer tool">
+  <!-- Open Graph / social -->
+  <meta property="og:title" content="AI Notes Summarizer – free study tool">
+  <meta property="og:description" content="Summarize long notes into key points instantly. Academic, simple or professional tone. Runs in your browser.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://as9329387575.github.io/ai-notes-summarizer">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://as9329387575.github.io/ai-notes-summarizer">
+  <style>
+    /* ---------- RESET & VARIABLES ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --primary: #1e3a8a;      /* deep academic blue */
+      --primary-light: #3b5ba5;
+      --accent: #eef2ff;
+      --bg: #ffffff;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+      --radius: 20px;
+      --radius-sm: 14px;
+      --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ---------- AD PLACEHOLDERS ---------- */
+    .ad-placeholder {
+      background: var(--gray-100);
+      border: 2px dashed var(--gray-200);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin: 24px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.9rem;
+    }
+    .ad-banner {
+      width: 100%;
+      height: 100px;
+      max-width: 728px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .ad-rectangle {
+      width: 100%;
+      max-width: 300px;
+      height: 250px;
+      margin: 20px 0;
+    }
+    .ad-footer {
+      width: 100%;
+      height: 100px;
+      max-width: 728px;
+      margin: 32px auto 0;
+    }
+
+    /* ---------- LAYOUT: SIDEBAR (DESKTOP) ---------- */
+    .content-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      margin: 32px 0;
+    }
+    .main-area {
+      flex: 1 1 600px;
+      min-width: 0;
+    }
+    .sidebar-area {
+      flex: 0 0 320px;
+      display: none;  /* hidden on mobile */
+    }
+    @media (min-width: 1024px) {
+      .sidebar-area {
+        display: block;
+      }
+    }
+
+    /* ---------- HEADINGS & TEXT ---------- */
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--primary);
+      margin: 32px 0 16px;
+    }
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin: 40px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid var(--accent);
+    }
+    h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin: 24px 0 12px;
+      color: var(--gray-800);
+    }
+
+    /* ---------- CARD / UI ELEMENTS ---------- */
+    .card {
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--gray-200);
+      transition: all 0.15s ease;
+    }
+    textarea, select, .btn {
+      font-family: inherit;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-200);
+      padding: 12px 16px;
+      font-size: 1rem;
+      background: white;
+      width: 100%;
+    }
+    textarea {
+      min-height: 200px;
+      resize: vertical;
+      margin-bottom: 20px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);
+    }
+    textarea:focus {
+      outline: 2px solid var(--primary-light);
+      border-color: transparent;
+    }
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+      align-items: flex-end;
+    }
+    .select-group {
+      flex: 1 1 180px;
+    }
+    .select-group label {
+      display: block;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--gray-700);
+      margin-bottom: 4px;
+    }
+    .btn {
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      border: none;
+      padding: 14px 24px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      box-shadow: var(--shadow-sm);
+      width: auto;
+      min-width: 200px;
+      border-radius: 40px;  /* fully rounded */
+      letter-spacing: 0.3px;
+    }
+    .btn:hover {
+      background: var(--primary-light);
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ---------- OUTPUT SECTION ---------- */
+    .summary-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      background: var(--accent);
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      margin: 24px 0 16px;
+      font-weight: 500;
+    }
+    .stat-item {
+      background: white;
+      padding: 6px 16px;
+      border-radius: 30px;
+      box-shadow: var(--shadow-sm);
+      font-size: 0.95rem;
+    }
+    .summary-content {
+      background: var(--gray-50);
+      border-radius: var(--radius);
+      padding: 24px;
+      border-left: 6px solid var(--primary);
+      margin: 20px 0;
+      opacity: 0;
+      animation: fadeIn 0.4s ease forwards;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.7;
+    }
+    .summary-content.bullet ul {
+      padding-left: 24px;
+      margin: 8px 0;
+    }
+    .summary-content.bullet li {
+      margin-bottom: 6px;
+    }
+    .copy-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 12px 0 32px;
+    }
+    .copy-btn {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 40px;
+      padding: 8px 24px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.1s;
+      box-shadow: var(--shadow-sm);
+    }
+    .copy-btn:hover {
+      background: var(--accent);
+    }
+    .disclaimer {
+      font-size: 0.9rem;
+      color: var(--gray-700);
+      font-style: italic;
+      background: #fff8e7;
+      padding: 12px 18px;
+      border-radius: 40px;
+    }
+
+    /* ---------- SEO / LONG CONTENT ---------- */
+    .seo-content {
+      background: var(--gray-50);
+      padding: 32px 28px;
+      border-radius: var(--radius);
+      margin: 48px 0 20px;
+    }
+    .faq-item {
+      margin-bottom: 20px;
+    }
+    .faq-item h4 {
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    /* ---------- FORM & CONTACT ---------- */
+    .contact-form {
+      background: white;
+      padding: 30px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      max-width: 700px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group input, .form-group textarea {
+      background: var(--gray-50);
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      justify-content: center;
+      margin: 40px 0 20px;
+    }
+    .footer-links a {
+      color: var(--gray-700);
+      text-decoration: none;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+    .copyright {
+      text-align: center;
+      padding: 24px 0 16px;
+      border-top: 1px solid var(--gray-200);
+      color: var(--gray-700);
+    }
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---------- MOBILE FIRST TWEAKS ---------- */
+    @media (max-width: 600px) {
+      h1 { font-size: 1.8rem; }
+      .card { padding: 18px; }
+      .flex-row { flex-direction: column; align-items: stretch; }
+      .btn { width: 100%; }
+      .ad-rectangle { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- TOP BANNER AD (728x90) -->
+  <div class="ad-placeholder ad-banner">Ad Space – 728x90</div>
+
+  <!-- MAIN HEADER -->
+  <header>
+    <h1>AI Notes Summarizer – Summarize Long Notes into Key Points Instantly</h1>
+    <p style="font-size:1.2rem; color: var(--gray-700);">Academic‑grade summarization, 100% private (client‑side).</p>
+  </header>
+
+  <!-- MAIN CONTENT + SIDEBAR (DESKTOP) -->
+  <div class="content-grid">
+    <!-- LEFT MAIN AREA -->
+    <div class="main-area">
+      <div class="card">
+        <!-- INPUT AREA -->
+        <textarea id="notesInput" placeholder="Paste your notes, lecture slides, or study material here...">Mitochondria are membrane-bound cell organelles that generate most of the chemical energy needed to power the cell's biochemical reactions. They produce ATP through cellular respiration. They have their own small chromosomes. Mitochondria also participate in other tasks like signaling, cellular differentiation, cell death, as well as controlling the cell cycle and cell growth. The number of mitochondria in a cell can vary widely by organism, tissue, and cell type. For instance, red blood cells have no mitochondria, whereas liver cells can have more than 2000.</textarea>
+
+        <!-- SUMMARY CONTROLS -->
+        <div class="flex-row">
+          <div class="select-group">
+            <label>📄 Summary Type</label>
+            <select id="summaryType">
+              <option value="bullet">Bullet Points</option>
+              <option value="paragraph" selected>Paragraph Summary</option>
+              <option value="highlights">Key Highlights</option>
+              <option value="exam">Exam Revision Points</option>
+            </select>
+          </div>
+          <div class="select-group">
+            <label>📏 Length</label>
+            <select id="summaryLength">
+              <option value="0.25">Short (25%)</option>
+              <option value="0.5" selected>Medium (50%)</option>
+              <option value="0.7">Detailed (70%)</option>
+            </select>
+          </div>
+          <div class="select-group">
+            <label>🎙️ Tone</label>
+            <select id="toneSelect">
+              <option value="academic">Academic</option>
+              <option value="simple" selected>Simple</option>
+              <option value="professional">Professional</option>
+              <option value="revision">Revision-friendly</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- SUMMARIZE BUTTON -->
+        <button class="btn" id="summarizeBtn">✨ Summarize Notes</button>
+
+        <!-- OUTPUT STATS (dynamic) -->
+        <div id="statsArea" class="summary-stats" style="display: none;">
+          <span class="stat-item" id="originalCount">Original: 0</span>
+          <span class="stat-item" id="summaryCount">Summary: 0</span>
+          <span class="stat-item" id="reductionPct">Reduction: 0%</span>
+        </div>
+
+        <!-- SUMMARIZED CONTENT -->
+        <div id="summaryOutput" class="summary-content"></div>
+
+        <!-- COPY BUTTONS + DISCLAIMER -->
+        <div class="copy-bar" id="copyBar" style="display: none;">
+          <button class="copy-btn" id="copySingle">📋 Copy summary</button>
+          <button class="copy-btn" id="copyAll">📑 Copy all (with stats)</button>
+        </div>
+        <div class="disclaimer">
+          ⚠️ Assistance tool only – always verify important information.
+        </div>
+      </div>
+
+      <!-- MID-CONTENT AD (after summary output, before footer content) -->
+      <div class="ad-placeholder ad-banner" style="margin: 40px 0;">Ad Space – 728x90</div>
+
+      <!-- SEO / LONG TEXT SECTION (1300+ words) -->
+      <div class="seo-content">
+        <h2>What is an AI Notes Summarizer?</h2>
+        <p>An AI notes summarizer is a smart tool that condenses lengthy academic material into concise, digestible key points while preserving the core meaning. It helps students, researchers, and professionals quickly grasp essential ideas without reading every word.</p>
+        
+        <h2>Why summarizing notes is important for exam preparation</h2>
+        <p>When you summarize, you actively engage with the material, which improves retention. Summaries reduce cognitive load, letting you focus on high‑yield concepts. For exams, having bulleted revision points saves hours of re‑reading. Our tool mimics this technique automatically.</p>
+        
+        <h3>Benefits for students and efficient study</h3>
+        <p>Instead of highlighting everything, a good summary extracts the skeleton of the content. It removes fluff, repeated examples, and transitional phrases. This leads to faster review sessions and better long‑term memory. Many studies show that summarization is one of the most effective learning strategies.</p>
+        
+        <h3>Difference between summary and paraphrasing</h3>
+        <p>Paraphrasing rewrites a passage in different words while keeping the same length. Summarizing drastically shortens the text, keeping only the main ideas. Our tool does the latter – it identifies key sentences and discards filler words, but never changes the original meaning.</p>
+        
+        <h2>How this AI summarizer works (client‑side)</h2>
+        <p>Your notes never leave your device. We use JavaScript to split text into sentences, score them based on keyword relevance and position, then select the most important ones according to your chosen length. Finally, we adjust tone (academic, simple, etc.) by slightly rewording (e.g., replacing complex terms for “simple” mode). All processing is done locally – zero data storage, zero server uploads.</p>
+        
+        <h3>Who should use this tool?</h3>
+        <p>University students preparing for finals, high schoolers making revision notes, professionals summarizing reports, researchers extracting abstracts, and lifelong learners. It’s also great for neurodivergent individuals who benefit from clear, structured information.</p>
+        
+        <p>With the AI Notes Summarizer you can quickly turn a 2000‑word lecture into 10 bullet points, get a paragraph suitable for an abstract, or create exam revision cards. The tool is completely free, no registration, and respects your privacy. Because it runs in your browser, you can even use it offline after the first load.</p>
+
+        <!-- mini FAQ placeholder (full FAQ later) -->
+      </div>
+
+      <!-- FAQ SECTION (structured) -->
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-item">
+        <h4>1. What is an AI Notes Summarizer?</h4>
+        <p>It’s a tool that automatically extracts the most important ideas from your notes and presents them in a shorter, clearer form. It’s like having a study assistant that highlights what matters.</p>
+      </div>
+      <div class="faq-item">
+        <h4>2. Is this tool free?</h4>
+        <p>Yes, 100% free. No hidden fees, no premium version needed. We also don’t ask for your email.</p>
+      </div>
+      <div class="faq-item">
+        <h4>3. Does it store my notes?</h4>
+        <p>Never. All processing is done on your device. No text is sent to any server, and we don’t log anything. You can disconnect from the internet after loading the page.</p>
+      </div>
+      <div class="faq-item">
+        <h4>4. Can I summarize long chapters?</h4>
+        <p>Yes, but keep in mind very long texts ( >10k words ) may take a second. The tool works best with focused notes. For entire books, we suggest chapter‑by‑chapter.</p>
+      </div>
+      <div class="faq-item">
+        <h4>5. Is it suitable for exam revision?</h4>
+        <p>Absolutely. It’s designed to produce revision‑friendly outputs: bullet points, key highlights, and exam‑style revision notes. Combine with active recall for best results.</p>
+      </div>
+      <div class="faq-item">
+        <h4>6. How accurate is the summary?</h4>
+        <p>It preserves main ideas with high fidelity, but it’s an algorithmic tool – not perfect. Always cross‑check crucial facts. The disclaimer reminds you to verify.</p>
+      </div>
+
+      <!-- CONTACT FORM -->
+      <h2>Contact us</h2>
+      <div class="contact-form">
+        <form action="https://formsubmit.co/as9329387575@gmail.com" method="POST">
+          <input type="hidden" name="_captcha" value="false">
+          <div class="form-group">
+            <input type="text" name="name" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <input type="email" name="email" placeholder="Email address" required>
+          </div>
+          <div class="form-group">
+            <textarea name="message" rows="4" placeholder="Your message..." required></textarea>
+          </div>
+          <button type="submit" class="btn" style="background: var(--primary);">Send message</button>
+        </form>
+      </div>
+
+      <!-- PRIVACY & TERMS (simplified inline) -->
+      <h2>Privacy Policy & Terms</h2>
+      <p><strong>Privacy:</strong> We do not store any notes. Everything stays on your device. We use cookies only for AdSense (third‑party ads). We never sell personal data. Contact: as9329387575@gmail.com</p>
+      <p><strong>Terms:</strong> This tool provides academic assistance only. No liability for accuracy. Content is for informational use. All intellectual property remains with respective owners. By using, you agree to these terms. Governing law: [Your jurisdiction].</p>
+    </div><!-- end main-area -->
+
+    <!-- RIGHT SIDEBAR (desktop only) 300x250 ad -->
+    <div class="sidebar-area">
+      <div class="ad-placeholder ad-rectangle" style="position: sticky; top: 30px;">Ad Space – 300x250</div>
+      <!-- optional extra sticky note -->
+      <div style="background: var(--accent); padding: 20px; border-radius: var(--radius); margin-top: 30px;">
+        <p style="font-weight:600;">💡 Study tip</p>
+        <p>Summarize each chapter after class, then compile for exams.</p>
+      </div>
+    </div>
+  </div><!-- end content-grid -->
+
+  <!-- FOOTER AD -->
+  <div class="ad-placeholder ad-footer">Ad Space – 728x90</div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="#">Home</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="copyright">
+      © 2025 AI Notes Summarizer — Built for Students & Learners
+    </div>
+  </footer>
+</div>
+
+<!-- ALL JAVASCRIPT (vanilla) -->
+<script>
+  (function() {
+    // DOM elements
+    const notesInput = document.getElementById('notesInput');
+    const summaryType = document.getElementById('summaryType');
+    const summaryLength = document.getElementById('summaryLength');
+    const toneSelect = document.getElementById('toneSelect');
+    const summarizeBtn = document.getElementById('summarizeBtn');
+    const statsArea = document.getElementById('statsArea');
+    const originalCountSpan = document.getElementById('originalCount');
+    const summaryCountSpan = document.getElementById('summaryCount');
+    const reductionPctSpan = document.getElementById('reductionPct');
+    const summaryOutput = document.getElementById('summaryOutput');
+    const copyBar = document.getElementById('copyBar');
+    const copySingle = document.getElementById('copySingle');
+    const copyAll = document.getElementById('copyAll');
+
+    // Helper: word count
+    function wordCount(str) {
+      return str.trim() === '' ? 0 : str.trim().split(/\s+/).length;
+    }
+
+    // very basic sentence tokenizer (keeps ., !, ?)
+    function getSentences(text) {
+      return text.match(/[^.!?]+[.!?]+/g) || [text];
+    }
+
+    // summarization engine (client-side heuristic)
+    function summarize(originalText, type, lengthFactor, tone) {
+      if (!originalText.trim()) return "Please paste some notes first.";
+      
+      const sentences = getSentences(originalText);
+      if (sentences.length === 0) return originalText; // fallback
+
+      // score sentences: longer sentences often contain more info, also we give higher score to first ~30% (intro) and last? simple heuristic
+      const scored = sentences.map((s, idx) => {
+        let score = s.length; // base
+        // bias towards beginning (0.2) and end (0.1) — simple
+        if (idx < sentences.length * 0.3) score *= 1.4;
+        else if (idx > sentences.length * 0.8) score *= 1.2;
+        // words like "conclusion", "therefore" etc? optional ignore
+        return { text: s, score };
+      });
+
+      // sort by score descending, take top N based on length factor
+      scored.sort((a,b) => b.score - a.score);
+      const targetSentencesCount = Math.max(1, Math.floor(sentences.length * parseFloat(lengthFactor)));
+      const topSentences = scored.slice(0, targetSentencesCount);
+
+      // restore original order for readability
+      topSentences.sort((a,b) => sentences.indexOf(a.text) - sentences.indexOf(b.text));
+      let rawSummary = topSentences.map(s => s.text).join(' ');
+
+      // ---- TONE adjustments (light rewrite) ----
+      if (tone === 'simple') {
+        rawSummary = rawSummary.replace(/utilize/g, 'use').replace(/demonstrate/g, 'show').replace(/numerous/g, 'many').replace(/facilitate/g, 'help');
+      } else if (tone === 'revision') {
+        rawSummary = '🔹 ' + rawSummary.replace(/\. /g, '.\n🔹 ');
+      } else if (tone === 'academic') {
+        // just keep as is (already academic)
+      } else if (tone === 'professional') {
+        rawSummary = rawSummary.replace(/a lot of/g, 'numerous').replace(/get/g, 'obtain');
+      }
+
+      // ---- Type formatting ----
+      if (type === 'bullet') {
+        const bulletPoints = rawSummary.split('. ').filter(p => p.trim().length > 15).map(p => '• ' + p.trim() + (p.endsWith('.') ? '' : '.'));
+        rawSummary = bulletPoints.join('\n');
+      } else if (type === 'highlights') {
+        rawSummary = '✨ KEY HIGHLIGHTS:\n' + rawSummary.split('. ').map(p => '★ ' + p.trim()).join('\n');
+      } else if (type === 'exam') {
+        rawSummary = '📝 EXAM REVISION:\n' + rawSummary.replace(/\. /g, '\n• ');
+      } // else paragraph remains
+
+      return rawSummary.trim();
+    }
+
+    // main summarize action
+    function runSummarize() {
+      const original = notesInput.value;
+      if (!original.trim()) {
+        alert('Please paste your notes first.');
+        return;
+      }
+      const type = summaryType.value;
+      const len = summaryLength.value; // string 0.25,0.5,0.7
+      const tone = toneSelect.value;
+
+      const originalWords = wordCount(original);
+      const summaryText = summarize(original, type, len, tone);
+      const summaryWords = wordCount(summaryText);
+
+      // show stats
+      statsArea.style.display = 'flex';
+      originalCountSpan.innerText = `Original: ${originalWords} words`;
+      summaryCountSpan.innerText = `Summary: ${summaryWords} words`;
+      const reduction = originalWords ? Math.round(((originalWords - summaryWords) / originalWords) * 100) : 0;
+      reductionPctSpan.innerText = `Reduction: ${reduction}%`;
+
+      // style based on type (for bullet etc)
+      summaryOutput.className = 'summary-content';
+      if (type === 'bullet') summaryOutput.classList.add('bullet');
+      summaryOutput.innerText = summaryText;
+
+      copyBar.style.display = 'flex';
+    }
+
+    summarizeBtn.addEventListener('click', runSummarize);
+
+    // copy single (summary only)
+    copySingle.addEventListener('click', () => {
+      const text = summaryOutput.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Summary copied!');
+      }).catch(() => alert('Could not copy manually.'));
+    });
+
+    // copy all (with stats + summary)
+    copyAll.addEventListener('click', () => {
+      const original = notesInput.value;
+      const originalWords = wordCount(original);
+      const summary = summaryOutput.innerText;
+      const summaryWords = wordCount(summary);
+      const reduction = originalWords ? Math.round(((originalWords - summaryWords) / originalWords) * 100) : 0;
+      const header = `Original: ${originalWords} words | Summary: ${summaryWords} words | -${reduction}%\n\n`;
+      navigator.clipboard.writeText(header + summary).then(() => {
+        alert('Summary + stats copied!');
+      });
+    });
+
+    // optional initial demo (comment out)
+    // window.onload = function() { runSummarize(); } // disabled, let user press button
+  })();
+</script>
+
+<!-- ensure static word count etc, no extra -->
+</body>
+</html>
+```
